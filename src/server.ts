@@ -40,7 +40,11 @@ router.get('/rovers/:rover/photos/:camera', (req, res) => {
 
         paginationStart = (page - 1) * PAGE_SIZE + 1;
         paginationEnd = page * PAGE_SIZE;
+    } else {
+        paginationStart = paginationStart || 1;
+        paginationEnd = paginationEnd || 25;
     }
+
 
     getPhotos(req.params.rover, req.params.camera, dateType, date, paginationStart, paginationEnd)
         .then(photos => res.send({photos: photos}));
