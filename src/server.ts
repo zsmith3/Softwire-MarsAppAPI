@@ -1,7 +1,7 @@
 // @ts-ignore
 import express from "express";
-import axios from "axios";
-import {getAllRovers, getPhotos} from "./nasa-api";
+import {getAllRovers, getPhotosByEarthDate, getPhotosBySol} from "./nasa-api";
+import {toInt} from "./util";
 
 const app = express();
 const port = 8000;
@@ -15,7 +15,9 @@ router.get('/rovers', (req, res) => {
 });
 
 router.get('/rovers/:rover/photos/:camera', (req, res) => {
-    getPhotos(req.params.rover, req.params.camera).then(photos => res.send(photos));
+    if (req.query.earth_date) getPhotosByEarthDate(req.params.rover, req.params.camera, req.query.earth_date.toString(), toInt(req.query.page)).then(photos => res.send(photos));
+    else if (req.query.sol) getPhotosBySol(req.params.rover, req.params.camera, toInt(req.query.sol), toInt(req.query.page)).then(photos => res.send(photos));
+    else getPhotosBySol(req.params.rover, req.params.camera, 1000, 1).then(photos => res.send(photos));
 })
 
 app.use('/', router);
