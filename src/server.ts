@@ -1,6 +1,6 @@
 // @ts-ignore
 import express from "express";
-import {getAllRovers, getPhotosByEarthDate, getPhotosBySol} from "./nasa-api";
+import {getAllRovers, getPhotos, PAGE_SIZE} from "./nasa-api";
 import {toInt} from "./util";
 
 const app = express();
@@ -15,9 +15,35 @@ router.get('/rovers', (req, res) => {
 });
 
 router.get('/rovers/:rover/photos/:camera', (req, res) => {
-    if (req.query.earth_date) getPhotosByEarthDate(req.params.rover, req.params.camera, req.query.earth_date.toString(), toInt(req.query.page)).then(photos => res.send({photos: photos}));
-    else if (req.query.sol) getPhotosBySol(req.params.rover, req.params.camera, toInt(req.query.sol), toInt(req.query.page)).then(photos => res.send({photos: photos}));
-    else getPhotosBySol(req.params.rover, req.params.camera, 1000, 1).then(photos => res.send({photos: photos}));
+    let dateType: "earth_date" | "sol", date: string | number;
+    if (req.query.earth_date) {
+        dateType = "earth_date";
+        date = req.query.earth_date.toString();
+    } else if (req.query.sol) {
+        dateType = "sol";
+        date = toInt(req.query.sol);
+    } else {
+        dateType = "sol";
+        date = 1000;
+    }
+
+    const page = toInt(req.query.page);
+    let paginationStart = toInt(req.query.paginationStart);
+    let paginationEnd = toInt(req.query.paginationEnd);
+
+    if (page) {
+        if (paginationStart && paginationEnd) {
+            res.status(400);
+            res.send({status: 400, message: "Cannot use paginationStart/End and page parameters together"});
+            return;
+        }
+
+        paginationStart = (page - 1) * PAGE_SIZE + 1;
+        paginationEnd = page * PAGE_SIZE;
+    }
+
+    getPhotos(req.params.rover, req.params.camera, dateType, date, paginationStart, paginationEnd)
+        .then(photos => res.send({photos: photos}));
 })
 
 app.use('/', router);
