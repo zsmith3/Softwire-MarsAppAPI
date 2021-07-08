@@ -22,7 +22,7 @@ async function getPhotosPage(roverName: string, cameraType: string, dateType: "e
         let errorStr: string;
         if (error.response && error.response.data && error.response.data.errors) errorStr = error.response.data.errors;
         else errorStr = error.toString();
-        throw {status: error.response.status, message: `NASA API error: ${errorStr}`};
+        throw {status: error.response ? error.response.status : 500, message: `NASA API error: ${errorStr}`};
     }
 }
 

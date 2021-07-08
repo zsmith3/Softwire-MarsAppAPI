@@ -8,6 +8,6 @@ export default class Rover {
     constructor (rover: Rover) {
         this.id = rover.id;
         this.name = rover.name;
-        this.cameras = rover.cameras.map(camera => new Camera(camera));
+        this.cameras = rover.cameras ? rover.cameras.map(camera => new Camera(camera)) : [];
     }
 }
