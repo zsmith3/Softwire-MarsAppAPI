@@ -1,9 +1,12 @@
 // @ts-ignore
 import express from "express";
+// @ts-ignore
+import cors from "cors";
 import {getAllRovers, getPhotos, PAGE_SIZE} from "./nasa-api";
 import {toInt} from "./util";
 
 const app = express();
+app.use(cors());
 const port = 8000;
 
 app.use(express.json());
