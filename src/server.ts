@@ -2,7 +2,7 @@
 import express from "express";
 // @ts-ignore
 import cors from "cors";
-import {getAllRovers, getPhotos, PAGE_SIZE} from "./nasa-api";
+import {getAllRovers, getAPODs, getPhotos, PAGE_SIZE} from "./nasa-api";
 import {toInt} from "./util";
 
 const app = express();
@@ -55,6 +55,19 @@ router.get('/rovers/:rover/photos/:camera', (req: express.Request, res: express.
 
     getPhotos(req.params.rover, req.params.camera, dateType, date, paginationStart, paginationEnd)
         .then(photos => res.send({photos: photos}))
+        .catch(error => {
+            res.status(error.status || 500);
+            res.send({status: error.status || 500, message: error.message || error.toString()});
+        });
+});
+
+router.get("/apod", (req: express.Request, res: express.Response) => {
+    if (!(req.query.start_date && req.query.end_date)) {
+        res.status(400);
+        res.send({status: 400, message: "Supply both start_date and end_date parameters"})
+    }
+    getAPODs(req.query.start_date, req.query.end_date)
+        .then(data => res.send(data))
         .catch(error => {
             res.status(error.status || 500);
             res.send({status: error.status || 500, message: error.message || error.toString()});

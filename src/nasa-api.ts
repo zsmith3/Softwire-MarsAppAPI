@@ -39,3 +39,8 @@ export async function getPhotos(roverName: string, cameraType: string, dateType:
     }
     return photos.slice(startOffset, photoCount - endOffset);
 }
+
+export async function getAPODs(startDate: string, endDate: string) {
+    const response = await axios.get(`https://api.nasa.gov/planetary/apod?start_date=${startDate}&end_date=${endDate}&api_key=${API_KEY}`);
+    return response.data;
+}
