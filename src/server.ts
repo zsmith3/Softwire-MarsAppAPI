@@ -64,7 +64,8 @@ router.get('/rovers/:rover/photos/:camera', (req: express.Request, res: express.
 router.get("/apod", (req: express.Request, res: express.Response) => {
     if (!(req.query.start_date && req.query.end_date)) {
         res.status(400);
-        res.send({status: 400, message: "Supply both start_date and end_date parameters"})
+        res.send({status: 400, message: "Supply both start_date and end_date parameters"});
+        return;
     }
     getAPODs(req.query.start_date, req.query.end_date)
         .then(data => res.send(data))
